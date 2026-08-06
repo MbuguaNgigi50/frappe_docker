@@ -1,0 +1,17 @@
+services:
+  backend:
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - ./dev-apps/policy_management:/home/frappe/frappe-bench/apps/policy_management
+  queue-short:
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - ./dev-apps/policy_management:/home/frappe/frappe-bench/apps/policy_management
+  queue-long:
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - ./dev-apps/policy_management:/home/frappe/frappe-bench/apps/policy_management
+  scheduler:
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - ./dev-apps/policy_management:/home/frappe/frappe-bench/apps/policy_management

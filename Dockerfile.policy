@@ -1,0 +1,49 @@
+# Rebuild mbugua/erpnext-custom:v16 with the Policy Management develop branch.
+#
+# The base image already has all apps cloned (frappe, erpnext, hrms, crm, etc.)
+# but policy_management is the bare scaffold from master. This Dockerfile
+# overlays the develop branch source from ./dev-apps/policy_management/,
+# reinstalls the Python package (including qrcode dep), builds the Vue SPA,
+# and runs bench build so assets are baked into the image.
+#
+# Build:
+#   docker build -f Dockerfile.policy -t mbugua/erpnext-custom:v16 .
+
+FROM mbugua/erpnext-custom:v16 AS base
+
+USER root
+
+# Overlay the develop branch source onto the existing clone.
+# node_modules / __pycache__ / .git are excluded in the host copy.
+COPY --chown=frappe:frappe dev-apps/policy_management/ /home/frappe/frappe-bench/apps/policy_management/
+
+USER frappe
+WORKDIR /home/frappe/frappe-bench
+
+# 1. Reinstall the Python package (picks up backend changes + qrcode dependency)
+RUN ./env/bin/pip install --no-cache-dir -e ./apps/policy_management
+
+# 2. Build the frontend SPA (Vite build -> public/frontend/ + www/insurance.html)
+#    node + yarn are already in the base image via nvm.
+RUN cd apps/policy_management/policy_management/frontend \
+    && yarn install --frozen-lockfile || yarn install \
+    && yarn build
+
+# 3. Add policy_management to sites/apps.txt so bench build links its assets
+RUN printf "frappe\nsaas_theme\nerpnext\nhrms\ninsights\ncrm\nwiki\npolicy_management\n" > sites/apps.txt
+
+# 4. Run bench build for policy_management (links assets + esbuild)
+RUN bench build --app policy_management
+
+# 5. Regenerate assets.json with ALL apps' bundle mappings (not just policy_management).
+#    The esbuild --production command above only maps policy_management's bundles.
+#    Run esbuild directly with all apps (excluding wiki — its frontend build fails
+#    without a site's common_site_config.json having socketio_port).
+RUN cd apps/frappe && node esbuild --production --apps frappe,erpnext,hrms,crm,insights,saas_theme,policy_management
+
+# 5. Refresh the baked assets snapshot so the entrypoint symlink serves the new build.
+#    Use -L to follow symlinks (bench build creates symlinks in sites/assets/ pointing
+#    to each app's public/ directory; we need the real files in the baked assets layer).
+RUN cp -rL /home/frappe/frappe-bench/sites/assets/* /home/frappe/frappe-bench/assets/ 2>/dev/null || true
+
+# The base image's ENTRYPOINT/CMD/VOLUME are inherited unchanged.

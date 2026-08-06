@@ -1,0 +1,26 @@
+[
+  {
+    "url": "https://github.com/MbuguaNgigi50/erpnext",
+    "branch": "develop"
+  },
+  {
+    "url": "https://github.com/MbuguaNgigi50/hrms",
+    "branch": "version-16"
+  },
+  {
+    "url": "https://github.com/MbuguaNgigi50/crm",
+    "branch": "main"
+  },
+  {
+    "url": "https://github.com/frappe/insights",
+    "branch": "v3.12.4"
+  },
+  {
+    "url": "https://github.com/frappe/wiki",
+    "branch": "v3.0.0"
+  },
+  {
+    "url": "https://github.com/vineyrawat/saas_theme",
+    "branch": "version-16"
+  }
+]

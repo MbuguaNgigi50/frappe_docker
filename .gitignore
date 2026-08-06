@@ -1,5 +1,10 @@
 # Environment Variables
 .env
+.env.bak*
+
+# Custom apps (have their own repos)
+dev-apps/
+prod-apps/
 
 # mounted volume
 sites

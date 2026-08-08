@@ -3,7 +3,8 @@
 .env.bak*
 
 # Custom apps (have their own repos)
-dev-apps/
+dev-apps/*
+!dev-apps/policy_management/
 prod-apps/
 
 # mounted volume

@@ -4,7 +4,8 @@
 
 # Custom apps (have their own repos)
 dev-apps/
-prod-apps/
+prod-apps/*
+!prod-apps/policy_management/
 
 # mounted volume
 sites
